@@ -1,0 +1,1676 @@
+{
+  "name": "Resume Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2960,
+        -1056
+      ],
+      "id": "085aaa18-6175-42a8-8763-10f5ad4ab9c3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -944,
+        48
+      ],
+      "id": "af48821c-e99a-434b-bac4-d48717e6bb13",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OUvkJHCIabqmWof5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/.n8n-files/Renzo_Takeda_Mendoza_Resume.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2768,
+        -1056
+      ],
+      "id": "93ca4bf2-07e8-44ff-8d8c-4c4f850b5266",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "={{$('Email Trigger (IMAP)').item.binary.attachment_0}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1632,
+        -224
+      ],
+      "id": "d541b631-77dd-41e8-aef5-911428482b16",
+      "name": "Extract from File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -2672,
+        -1232
+      ],
+      "id": "74e5583a-2843-41b7-bc6d-48ae9ed9b99c",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OUvkJHCIabqmWof5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an HR screening assistant.\n\nYour task is to evaluate whether this candidate is suitable for a Cloud Engineer position.\n\nJob Requirements:\n{{ $json[\"Job Title Posting\"] }}\n{{ $json.Requirements }}\nConsider:\n\n- Technical skills\n- Projects\n- Professional experience\n- Evidence that the projects support the listed skills\n\nReturn ONLY valid JSON.\n\nMake sure to give a rating between 1-100.\n\n{\n  \"rating\": 0,\n  \"recommendation\": \"PASS\" | \"REVIEW\" | \"REJECT\",\n  \"confidence\": 0,\n  \"strengths\": [],\n  \"weaknesses\": [],\n  \"explanation\": \"\"\n}\n\nCandidate:\n{{ $json.name }}{{ $json.location }}{{ $json.skills }}{{ $json.projects }}{{ $json.experience }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -2672,
+        -1424
+      ],
+      "id": "6a7f526b-8b9e-420a-b805-7649aa6a1bc4",
+      "name": "HR Rating"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const cleaned = $json.text\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\nreturn {\n  json: JSON.parse(cleaned)\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        -160
+      ],
+      "id": "ab9513a5-5b26-40ce-a3cb-08b1c3f3ba8d",
+      "name": "Structured JSON Resume"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a574f9f8-963b-4876-8dfe-f4bee90197d7",
+              "name": "Job Title",
+              "value": "Cloud Engineer",
+              "type": "string"
+            },
+            {
+              "id": "fd5f0020-7caf-4d6b-a2a7-e561913c33c4",
+              "name": "Skills Needed",
+              "value": "[\"AWS\", \"Linux\", \"Docker\", \"Terraform\", \"Azure\"]",
+              "type": "array"
+            },
+            {
+              "id": "307ec69f-2ea2-4c72-9485-6e5df9022ce9",
+              "name": "Experience",
+              "value": "Must have relevant experience may it be internship or previous employments.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        -224
+      ],
+      "id": "54a0830e-8554-40ae-a28c-7511a8caae24",
+      "name": "Job Description"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1152,
+        -160
+      ],
+      "id": "9e895fe4-a0e8-4cad-8889-c651b4c03e81",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2336,
+        -1424
+      ],
+      "id": "0a4f058f-4d7c-4cae-844b-a76cb79e3f53",
+      "name": "Wait",
+      "webhookId": "fc6a2bf9-12b0-414a-8cd4-d1170218a57b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8316e74d-03ce-4088-b5a7-167e16a83cbe",
+              "name": "Applicant Resume",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        -48
+      ],
+      "id": "270a2c7a-6bff-4f01-9cf1-2e7aa426c874",
+      "name": "Applicant Description"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert technical recruiter.\n\nCompare the applicant's resume against the job requirements.\n\nJob Title:\n{{ $json[\"Job Title\"] }}\n\nRequired Skills:\n{{ JSON.stringify($json[\"Skills Needed\"]) }}\n\nExperience Requirement:\n{{ $json[\"Experience\"] }}\n\nApplicant Resume:\n{{ $json[\"Applicant Resume\"] }}\n\nReturn ONLY valid JSON.\n\n{\n  \"name\": \"\",\n  \"email\": \"\",\n  \"location\": \"\",\n  \"score\": 0,\n  \"recommendation\": \"\",\n  \"strengths\": [],\n  \"missingSkills\": [],\n  \"explanation\": \"\"\n}\n\nThe recommendation field should only be either of the three: \"PASS\", \"REVIEW\", \"REJECT\".\nThe score should range between 1-100.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -944,
+        -160
+      ],
+      "id": "bb25e292-95ec-4c37-b2ee-ae9f660b6238",
+      "name": "Evaluator AI"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "KVfbf5OHAqiCFS4x",
+          "mode": "list",
+          "cachedResultName": "Applicants",
+          "cachedResultUrl": "/projects/uZKH9oLvcCVfKLYd/datatables/KVfbf5OHAqiCFS4x"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "score": "={{ $json.score }}",
+            "status": "={{ $json.recommendation }}",
+            "explanation": "={{ $json.explanation }}",
+            "email": "={{ $json.email }}",
+            "resume": "={{ $('Merge (AI + Original Binary)').item.binary.Resume }}"
+          },
+          "matchingColumns": [
+            "name"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "explanation",
+              "displayName": "explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "resume",
+              "displayName": "resume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2576,
+        -704
+      ],
+      "id": "ba04c131-649e-4696-b5c2-4a6b0457d7a1",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Update Regarding Your Application",
+        "html": "Greetings, your application is currently under review. Kindly wait 3-5 business days, and we will contact you immediately once the results are out.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        32
+      ],
+      "id": "acbae003-b625-46bd-829d-53a2e507ca46",
+      "name": "Under Review",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Update Regarding Your Application",
+        "html": "We appreciate the time you've taken to do this. Unfortunately, on this occasion, we regret to inform you that your application has not been short-listed. We have received a number of applications that are a closer match to the business requirements at this moment in time.\n\nHowever, we will keep your application on file and get in touch should a potential opportunity arise.\n\nWe would like to take this opportunity to wish you every success in your job search.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        224
+      ],
+      "id": "6e307b50-9558-4818-82c1-df381b0eb285",
+      "name": "Reject",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Yoooo",
+        "html": "Congrats nigga pasado ka na",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        -160
+      ],
+      "id": "8b440715-13ae-491a-810a-98352cfb70d1",
+      "name": "Pass",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6afbbec3-a6e7-4839-accd-54162203f386",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "PASS",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        272,
+        -64
+      ],
+      "id": "f174cb0f-3fdb-4608-b9f0-0d4e10f4b613",
+      "name": ">= 80"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6afbbec3-a6e7-4839-accd-54162203f386",
+              "leftValue": "={{ $json.recommendation }}",
+              "rightValue": "REVIEW",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        32
+      ],
+      "id": "ee71c11b-a31d-4dcc-94c2-a2cfc589e7e6",
+      "name": ">= 60"
+    },
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -2688,
+        32
+      ],
+      "id": "72e70653-4f40-4eae-8726-624c90ec0075",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "GeiZ1gOkTXQ87CHY",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.from.value[0].address }}",
+        "subject": "No Resume Attached",
+        "html": "The email you sent does not have any attachments.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -2320,
+        208
+      ],
+      "id": "6bf3bfbb-b035-4595-aae2-f783d145046e",
+      "name": "No Resume Attached",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.from.value[0].address }}",
+        "subject": "Incorrect File Type",
+        "html": "=Hi {{ $json.from.value[0].name }}. The email you sent contains the incorrect file type, we only accept PDFs. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -1648,
+        32
+      ],
+      "id": "238bf78d-1b66-420c-acc1-4294c5fa75a6",
+      "name": "Incorrect File Type",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fdb9b57d-8c8e-4623-bea3-67636a549d8d",
+              "leftValue": "={{ $binary.attachment_0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2528,
+        32
+      ],
+      "id": "e199d9af-a8cb-48bf-a71f-18bea940b873",
+      "name": "Attachment Exist?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fdb9b57d-8c8e-4623-bea3-67636a549d8d",
+              "leftValue": "={{ $binary.attachment_0.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2320,
+        16
+      ],
+      "id": "f970875d-898f-483f-a102-f8bc85da3522",
+      "name": "Attachment == PDF ?"
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}",
+        "subject": "Incorrect File Type",
+        "html": "=Hi {{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}. The email you sent contains the incorrect file type, we only accept PDFs. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -1184,
+        112
+      ],
+      "id": "49232084-829c-4b30-842e-6a1ca2fddb44",
+      "name": "Corrupted PDF",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a8dbf9ca-c466-4ed8-acc5-b7016e4bb92e",
+              "name": "Resume",
+              "value": "={{ $('Email Trigger (IMAP)').item.binary.attachment_0 }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        -384
+      ],
+      "id": "06147cc0-50de-448d-b48f-c16d9016079b",
+      "name": "Store Original Resume"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS applicants (\n    id SERIAL PRIMARY KEY,\n\n    applicant_name TEXT,\n    applicant_email TEXT,\n\n    job_title TEXT,\n\n    score INTEGER,\n    recommendation TEXT,\n    explanation TEXT,\n\n    strengths JSONB,\n    missing_skills JSONB,\n\n    status TEXT,\n\n    resume_text TEXT,\n\n    resume_filename TEXT,\n    resume_mimetype TEXT,\n    resume_size INTEGER,\n\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2960,
+        -864
+      ],
+      "id": "1d2b591d-40f0-453b-9921-d06d3c52da45",
+      "name": "Create New Table",
+      "credentials": {
+        "postgres": {
+          "id": "XZwpJP9wxcFbz6fZ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM applicants;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2960,
+        -704
+      ],
+      "id": "9c710ada-576b-420f-9989-709fa81b5a98",
+      "name": "Select",
+      "credentials": {
+        "postgres": {
+          "id": "XZwpJP9wxcFbz6fZ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "applications",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "NO_RESUME_ATTACHED"
+            },
+            {
+              "fieldId": "explanation",
+              "fieldValue": "The applicant did not include an attachment."
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1648,
+        208
+      ],
+      "id": "6b8bf5b7-7e48-4a24-b60b-2d5ebd46e99e",
+      "name": "No Resume Attached (Insert Row)",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "KVfbf5OHAqiCFS4x",
+          "mode": "list",
+          "cachedResultName": "Applicants",
+          "cachedResultUrl": "/projects/uZKH9oLvcCVfKLYd/datatables/KVfbf5OHAqiCFS4x"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}",
+            "status": "=NO_RESUME_ATTACHED",
+            "email": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}",
+            "explanation": "The applicant did not include an attachment."
+          },
+          "matchingColumns": [
+            "name"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "explanation",
+              "displayName": "explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2752,
+        -864
+      ],
+      "id": "8e9ce09f-6fda-46e3-81c0-a4d92a758f9a",
+      "name": "No Resume Attached (Insert Row)1"
+    },
+    {
+      "parameters": {
+        "tableId": "applications",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "INCORRECT_FILE_TYPE"
+            },
+            {
+              "fieldId": "explanation",
+              "fieldValue": "The applicant sent the incorrect type of file for the attachment."
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        288
+      ],
+      "id": "96b0e86d-4624-48ba-8b27-b13ce0dea588",
+      "name": "Incorrect File Type (Insert Row)",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "KVfbf5OHAqiCFS4x",
+          "mode": "list",
+          "cachedResultName": "Applicants",
+          "cachedResultUrl": "/projects/uZKH9oLvcCVfKLYd/datatables/KVfbf5OHAqiCFS4x"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}",
+            "status": "=INCORRECT_FILE_TYPE",
+            "email": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}",
+            "explanation": "The applicant sent the incorrect type of file for the attachment."
+          },
+          "matchingColumns": [
+            "name"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "explanation",
+              "displayName": "explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2752,
+        -704
+      ],
+      "id": "064dac64-a96a-458b-9e15-71fdaba62ef5",
+      "name": "Incorrect File Type (Insert Row)1"
+    },
+    {
+      "parameters": {
+        "tableId": "applications",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.from.value[0].name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.from.value[0].address }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "CORRUPTED_PDF"
+            },
+            {
+              "fieldId": "explanation",
+              "fieldValue": "The applicant sent a corrupted PDF file."
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        112
+      ],
+      "id": "3684eacc-1199-46a2-8cf3-8e20fffdb2f8",
+      "name": "Corrupted PDF (Insert Row)",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "KVfbf5OHAqiCFS4x",
+          "mode": "list",
+          "cachedResultName": "Applicants",
+          "cachedResultUrl": "/projects/uZKH9oLvcCVfKLYd/datatables/KVfbf5OHAqiCFS4x"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.from.value[0].name }}",
+            "status": "=CORRUPTED_PDF",
+            "email": "={{ $json.from.value[0].address }}",
+            "explanation": "The applicant sent a corrupted PDF file."
+          },
+          "matchingColumns": [
+            "name"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "explanation",
+              "displayName": "explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2576,
+        -864
+      ],
+      "id": "f62b6f4e-b25b-43b2-b912-9c19af98ba7e",
+      "name": "Corrupted PDF (Insert Row)1"
+    },
+    {
+      "parameters": {
+        "tableId": "applications",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.email }}"
+            },
+            {
+              "fieldId": "location",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.location }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.score }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.recommendation }}"
+            },
+            {
+              "fieldId": "recommendation",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.recommendation }}"
+            },
+            {
+              "fieldId": "explanation",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.explanation }}"
+            },
+            {
+              "fieldId": "strengths",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.strengths }}"
+            },
+            {
+              "fieldId": "missing_skills",
+              "fieldValue": "={{ $('Merge (AI + Original Binary)').item.json.missingSkills }}"
+            },
+            {
+              "fieldId": "original_filename",
+              "fieldValue": "={{ $('Store Original Resume').item.binary.Resume.fileName }}"
+            },
+            {
+              "fieldId": "resume_url",
+              "fieldValue": "={{ \"https://tapiqbwuhdectioenurn.supabase.co/storage/v1/object/public/\" + $json.Key }}"
+            },
+            {
+              "fieldId": "resume_hash",
+              "fieldValue": "={{$('Code in JavaScript').item.json.resume_hash}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -160
+      ],
+      "id": "b49c1095-c335-4609-b9a3-44016efbf6d5",
+      "name": "Insert Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -480,
+        -368
+      ],
+      "id": "0cc390ad-12cd-46d5-b15e-469d687d7e16",
+      "name": "Merge (AI + Original Binary)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const crypto = require('crypto');\n\nconst binaryProperty = Object.keys($binary)[0];\n\nconst buffer = await this.helpers.getBinaryDataBuffer(\n  0,\n  binaryProperty\n);\n\nconst resumeHash = crypto\n  .createHash('sha256')\n  .update(buffer)\n  .digest('hex');\n\nreturn {\n  json: {\n    ...$json,\n    resume_hash: resumeHash,\n  },\n  binary: $binary,\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2128,
+        -208
+      ],
+      "id": "4041deda-2645-4494-a60c-a9096e33bd28",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "applications",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "resume_hash",
+              "condition": "eq",
+              "keyValue": "={{$json.resume_hash}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1968,
+        -336
+      ],
+      "id": "8c62ded8-18d5-4222-9841-6b30af9393b4",
+      "name": "Get Many (PENDING)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fdb9b57d-8c8e-4623-bea3-67636a549d8d",
+              "leftValue": "={{$json.id}}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1808,
+        -464
+      ],
+      "id": "63660ed0-aef7-4812-8938-b3d8bc07e893",
+      "name": "Exist = True? (PENDING)"
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Incorrect File Type",
+        "html": "=Hi {{ $json.name }}. It seems that you've already applied for this role. Kindly wait for our response.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -1616,
+        -480
+      ],
+      "id": "e3276f82-c212-4ee8-9bbc-6278d174de3d",
+      "name": "Already Applied (PENDING)",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://tapiqbwuhdectioenurn.supabase.co/storage/v1/object/resumes/{{$json.storage_filename}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhcGlxYnd1aGRlY3Rpb2VudXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDg4MTg1NywiZXhwIjoyMTAwNDU3ODU3fQ.kYtEjcprVSROc67bUZDpCxlmK5PulwTj4j1ykkRGcb8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhcGlxYnd1aGRlY3Rpb2VudXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDg4MTg1NywiZXhwIjoyMTAwNDU3ODU3fQ.kYtEjcprVSROc67bUZDpCxlmK5PulwTj4j1ykkRGcb8"
+            },
+            {
+              "name": "x-upsert",
+              "value": "false"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        -160
+      ],
+      "id": "b28e4647-d5d9-4278-9c37-9709c2a383ee",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a8dbf9ca-c466-4ed8-acc5-b7016e4bb92e",
+              "name": "storage_filename",
+              "value": "={{Date.now() + \"_\" + $binary.Resume.fileName}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        -160
+      ],
+      "id": "246c252c-c991-4928-867a-f51afed91d82",
+      "name": "Storage file name"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Evaluator AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        []
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Job Description",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Applicant Description",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Original Resume",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Corrupted PDF (Insert Row)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "HR Rating",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured JSON Resume": {
+      "main": [
+        [
+          {
+            "node": "Merge (AI + Original Binary)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Job Description": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Evaluator AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Rating": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HR Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant Description": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Evaluator AI": {
+      "main": [
+        [
+          {
+            "node": "Structured JSON Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        []
+      ]
+    },
+    ">= 80": {
+      "main": [
+        [
+          {
+            "node": "Pass",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ">= 60",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ">= 60": {
+      "main": [
+        [
+          {
+            "node": "Under Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Attachment Exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment Exist?": {
+      "main": [
+        [
+          {
+            "node": "Attachment == PDF ?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Resume Attached",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment == PDF ?": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect File Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect File Type": {
+      "main": [
+        [
+          {
+            "node": "Incorrect File Type (Insert Row)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Resume Attached": {
+      "main": [
+        [
+          {
+            "node": "No Resume Attached (Insert Row)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Original Resume": {
+      "main": [
+        [
+          {
+            "node": "Merge (AI + Original Binary)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Corrupted PDF (Insert Row)": {
+      "main": [
+        [
+          {
+            "node": "Corrupted PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Corrupted PDF (Insert Row)1": {
+      "main": [
+        []
+      ]
+    },
+    "Insert Credentials": {
+      "main": [
+        [
+          {
+            "node": ">= 80",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge (AI + Original Binary)": {
+      "main": [
+        [
+          {
+            "node": "Storage file name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get Many (PENDING)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Many (PENDING)": {
+      "main": [
+        [
+          {
+            "node": "Exist = True? (PENDING)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exist = True? (PENDING)": {
+      "main": [
+        [
+          {
+            "node": "Already Applied (PENDING)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Insert Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Storage file name": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "aa2583a9-b96b-4711-873d-a4ecf1dd4f63",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "82bb8dcb194890398da8e408ab0c36f9c3d55c852c3fcd314df15faa1db41c00"
+  },
+  "nodeGroups": [],
+  "id": "3AfUw8CWbtXGN18k",
+  "tags": []
+}
