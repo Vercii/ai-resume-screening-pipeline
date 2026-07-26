@@ -6,8 +6,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -2960,
-        -1056
+        -3504,
+        -1504
       ],
       "id": "085aaa18-6175-42a8-8763-10f5ad4ab9c3",
       "name": "When clicking ‘Execute workflow’"
@@ -40,8 +40,8 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        -2768,
-        -1056
+        -3312,
+        -1504
       ],
       "id": "93ca4bf2-07e8-44ff-8d8c-4c4f850b5266",
       "name": "Read/Write Files from Disk"
@@ -69,8 +69,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        -2672,
-        -1232
+        -3216,
+        -1680
       ],
       "id": "74e5583a-2843-41b7-bc6d-48ae9ed9b99c",
       "name": "Google Gemini Chat Model1",
@@ -90,8 +90,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        -2672,
-        -1424
+        -3216,
+        -1872
       ],
       "id": "6a7f526b-8b9e-420a-b805-7649aa6a1bc4",
       "name": "HR Rating"
@@ -167,8 +167,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -2336,
-        -1424
+        -2880,
+        -1872
       ],
       "id": "0a4f058f-4d7c-4cae-844b-a76cb79e3f53",
       "name": "Wait",
@@ -304,8 +304,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2576,
-        -704
+        -3120,
+        -1152
       ],
       "id": "ba04c131-649e-4696-b5c2-4a6b0457d7a1",
       "name": "Insert row"
@@ -587,8 +587,8 @@
       "parameters": {
         "fromEmail": "example@gmail.com",
         "toEmail": "={{ $('Email Trigger (IMAP)').item.json.from.value[0].address }}",
-        "subject": "Incorrect File Type",
-        "html": "=Hi {{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}. The email you sent contains the incorrect file type, we only accept PDFs. ",
+        "subject": "Corrupted PDF",
+        "html": "=Hi, {{ $('Email Trigger (IMAP)').item.json.from.value[0].name }}. The email you sent contains a corrupted PDF. Kindly check your attachment, and send us another one.",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
@@ -640,8 +640,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -2960,
-        -864
+        -3504,
+        -1312
       ],
       "id": "1d2b591d-40f0-453b-9921-d06d3c52da45",
       "name": "Create New Table",
@@ -661,8 +661,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -2960,
-        -704
+        -3504,
+        -1152
       ],
       "id": "9c710ada-576b-420f-9989-709fa81b5a98",
       "name": "Select",
@@ -792,8 +792,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2752,
-        -864
+        -3296,
+        -1312
       ],
       "id": "8e9ce09f-6fda-46e3-81c0-a4d92a758f9a",
       "name": "No Resume Attached (Insert Row)1"
@@ -917,8 +917,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2752,
-        -704
+        -3296,
+        -1152
       ],
       "id": "064dac64-a96a-458b-9e15-71fdaba62ef5",
       "name": "Incorrect File Type (Insert Row)1"
@@ -1042,8 +1042,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2576,
-        -864
+        -3120,
+        -1312
       ],
       "id": "f62b6f4e-b25b-43b2-b912-9c19af98ba7e",
       "name": "Corrupted PDF (Insert Row)1"
@@ -1150,96 +1150,6 @@
     },
     {
       "parameters": {
-        "operation": "getAll",
-        "tableId": "applications",
-        "limit": 1,
-        "matchType": "allFilters",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "resume_hash",
-              "condition": "eq",
-              "keyValue": "={{$json.resume_hash}}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        -1968,
-        -336
-      ],
-      "id": "8c62ded8-18d5-4222-9841-6b30af9393b4",
-      "name": "Get Many (PENDING)",
-      "alwaysOutputData": true,
-      "credentials": {
-        "supabaseApi": {
-          "id": "nqZfp5HJIXzgKcia",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "fdb9b57d-8c8e-4623-bea3-67636a549d8d",
-              "leftValue": "={{$json.id}}",
-              "rightValue": "application/pdf",
-              "operator": {
-                "type": "number",
-                "operation": "exists",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -1808,
-        -464
-      ],
-      "id": "63660ed0-aef7-4812-8938-b3d8bc07e893",
-      "name": "Exist = True? (PENDING)"
-    },
-    {
-      "parameters": {
-        "fromEmail": "example@gmail.com",
-        "toEmail": "={{ $json.email }}",
-        "subject": "Incorrect File Type",
-        "html": "=Hi {{ $json.name }}. It seems that you've already applied for this role. Kindly wait for our response.",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        -1616,
-        -480
-      ],
-      "id": "e3276f82-c212-4ee8-9bbc-6278d174de3d",
-      "name": "Already Applied (PENDING)",
-      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
-      "credentials": {
-        "smtp": {
-          "id": "ETBWKi9FbEQ9t9yd",
-          "name": "SMTP account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "=https://tapiqbwuhdectioenurn.supabase.co/storage/v1/object/resumes/{{$json.storage_filename}}",
         "sendHeaders": true,
@@ -1296,6 +1206,96 @@
       ],
       "id": "246c252c-c991-4928-867a-f51afed91d82",
       "name": "Storage file name"
+    },
+    {
+      "parameters": {
+        "fromEmail": "example@gmail.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Duplicate Application",
+        "html": "=Hi {{ $('Code in JavaScript').item.json.from.value[0].name }}. It seems that you've already applied for this role. Kindly wait for our response.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -1616,
+        -480
+      ],
+      "id": "e3276f82-c212-4ee8-9bbc-6278d174de3d",
+      "name": "Already Applied",
+      "webhookId": "7d7c54b5-7ad6-4de6-a5e9-c50ab68515be",
+      "credentials": {
+        "smtp": {
+          "id": "ETBWKi9FbEQ9t9yd",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fdb9b57d-8c8e-4623-bea3-67636a549d8d",
+              "leftValue": "={{$json.id}}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1808,
+        -464
+      ],
+      "id": "63660ed0-aef7-4812-8938-b3d8bc07e893",
+      "name": "Exist = True? "
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "applications",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "resume_hash",
+              "condition": "eq",
+              "keyValue": "={{$json.resume_hash}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1968,
+        -336
+      ],
+      "id": "8c62ded8-18d5-4222-9841-6b30af9393b4",
+      "name": "Get Many",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "nqZfp5HJIXzgKcia",
+          "name": "Supabase account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1600,36 +1600,7 @@
       "main": [
         [
           {
-            "node": "Get Many (PENDING)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Many (PENDING)": {
-      "main": [
-        [
-          {
-            "node": "Exist = True? (PENDING)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Exist = True? (PENDING)": {
-      "main": [
-        [
-          {
-            "node": "Already Applied (PENDING)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Extract from File",
+            "node": "Get Many",
             "type": "main",
             "index": 0
           }
@@ -1657,6 +1628,35 @@
           }
         ]
       ]
+    },
+    "Exist = True? ": {
+      "main": [
+        [
+          {
+            "node": "Already Applied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Many": {
+      "main": [
+        [
+          {
+            "node": "Exist = True? ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -1665,7 +1665,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "aa2583a9-b96b-4711-873d-a4ecf1dd4f63",
+  "versionId": "e4b64506-c6db-4d25-be28-4e99ebee08d2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "82bb8dcb194890398da8e408ab0c36f9c3d55c852c3fcd314df15faa1db41c00"
