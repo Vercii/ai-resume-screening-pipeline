@@ -336,30 +336,11 @@ docs/test-cases/
 
 ---
 
-# Screenshots
+# Screenshot
 
 Workflow
 
 ![Screenshot](docs/images/workflow.png)
-
-
-Architecture
-
-
-docs/images/architecture.png
-
-
-Duplicate Detection
-
-
-docs/images/duplicate.png
-
-
-Storage
-
-
-docs/images/storage.png
-
 
 ---
 
@@ -367,9 +348,9 @@ docs/images/storage.png
 
 A complete walkthrough of the workflow is available in:
 
-```
-docs/demo.md
-```
+
+![docs/test-cases](github.com/docs/test-cases)
+
 
 ---
 
