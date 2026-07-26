@@ -3,6 +3,11 @@
 An automated AI-powered resume screening pipeline built with **n8n**, **Google Gemini**, and **Supabase**. The workflow validates incoming applications, detects invalid submissions, extracts applicant information, evaluates resumes against a job description using AI, stores applicant data and original resumes, and automatically responds to applicants based on screening results.
 
 ---
+https://github.com/user-attachments/assets/709a0b84-05c4-42e7-981b-74036c598c70
+### A complete walkthrough of the workflow is available in:
+### ![docs/test-cases](https://github.com/Vercii/ai-resume-screening-pipeline/tree/main/docs/test-cases)
+
+---
 
 ## Overview
 
@@ -341,16 +346,6 @@ docs/test-cases/
 Workflow
 
 ![Screenshot](docs/images/workflow.png)
-
----
-
-# Demo
-
-A complete walkthrough of the workflow is available in:
-
-
-![docs/test-cases](https://github.com/Vercii/ai-resume-screening-pipeline/tree/main/docs/test-cases)
-
 
 ---
 
