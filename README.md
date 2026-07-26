@@ -349,7 +349,7 @@ Workflow
 A complete walkthrough of the workflow is available in:
 
 
-![docs/test-cases](github.com/docs/test-cases)
+![docs/test-cases](https://github.com/Vercii/ai-resume-screening-pipeline/tree/main/docs/test-cases)
 
 
 ---
