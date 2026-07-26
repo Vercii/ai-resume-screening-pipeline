@@ -340,27 +340,26 @@ docs/test-cases/
 
 Workflow
 
-```
-docs/images/workflow.png
-```
+![Screenshot](docs/images/workflow.png)
+
 
 Architecture
 
-```
+
 docs/images/architecture.png
-```
+
 
 Duplicate Detection
 
-```
+
 docs/images/duplicate.png
-```
+
 
 Storage
 
-```
+
 docs/images/storage.png
-```
+
 
 ---
 
